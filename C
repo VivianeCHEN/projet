@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <ctype.h>
+
+/*-------------Declaration preliminaire--------------------*/
+void saisie()      ;
+void affichage()   ;
+
+
+
+/* --------------------------------- */
+main()
+{
+	int choix = -1;
+	/* ------Menu------ */
+	while (choix !=0)
+	{
+	printf("-1- Saisie\n")   ;
+	printf("-2- Affichage\n");
+	printf("-0- Quitter\n")  ;
+	printf("Choix : ")       ;
+	scanf("%d", &choix)      ;	
+	
+	switch(choix)
+	 {
+		case 1: saisie()      ;
+				break         ;
+		case 2: affichage()   ;
+				break         ;
+		case 0 : printf ("Au revoir\n")  ;
+				break                    ;
+		default: printf("Erreur de saisie\n");
+				break                        ;
+							
+	 }
+	}
+}
+
+/* --------------------------------- */
+void saisie()
+{
+
+printf("Saisie....\n");
+
+}
+
+
+
+
+
+
+/* --------------------------------- */
+void affichage()
+{
+
+printf("Affichage...\n");
+
+}
