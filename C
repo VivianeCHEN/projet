@@ -5,9 +5,9 @@
 /*..........................Type globale..........................*/
 
 struct produit{
-	int numprod, quantite, tva, seuilcmd;
+	int numprod, quantite, seuilcmd;
 	char nom[20], typeprix[10], dlc[10];
-	float prix;
+	float prix, tva;
 };
 
 /*..........................Variable globale..........................*/
@@ -20,21 +20,23 @@ int a_sauvegarder=0;
 void saisie(); /* correspond au référencement par le gestionnaire de stock*/
 void affichage(); /*affiche un element souhaité*/
 void quitter();
+void chargement();
+//void verif_sauv();
 
-
-/*....................................................*/
+/*.......................Menu .............................*/
 
 main()
 {
 	int choix = -1;
 	struct produit unproduit;
 	
-/*...............................Menu...................*/
+/*...............Menu..........*/
 
 while (choix !=0)
 {
 	printf("-1- Saisi de nouveaux produits\n")   ;
 	printf("-2- Affichage des produits\n");
+	printf("-3- Chargement d'un fichier de produits dans la BDD\n");
 	printf("-0- Quitter\n")  ;
 	printf("Choix : ")       ;
 	scanf("%d", &choix)      ;	
@@ -44,7 +46,9 @@ while (choix !=0)
 		case 1: saisie()      ;
 				break         ;
 		case 2: affichage()   ;
-				break         ; 
+				break         ;
+		case 3: chargement()  ;
+				break		  ; 
 		case 0: quitter() 	  ;
 				break	      ;        
 		default: printf("Erreur de saisie\n");
@@ -81,7 +85,7 @@ void saisie() /* Saisie de nouveaux produits en stock */
 	   printf("La date limite de consommation du produit est (ex: 14/02/2016): ");
 	   scanf("%s", unproduit.dlc); 
 	   printf("La tva est (ex: écrire 0.2 pour 20%%): ");
-	   scanf("%d",&unproduit.tva); 
+	   scanf("%f",&unproduit.tva); 
 	   
 	   tabproduit[i++]=unproduit; 
 		}
@@ -94,7 +98,7 @@ void saisie() /* Saisie de nouveaux produits en stock */
 }
 
 
-/* --------------------------------- */
+/* -----------------Affichage ---------------- */
 void affichage()
 {
 
@@ -103,6 +107,55 @@ printf("Affichage...\n");
 
 }
 
+
+/* --------------- Chargement du fichier (base produits)-------------- */ 
+
+void chargement()
+{
+
+struct produit unproduit;
+int i=0, lectureOk;
+char nomfichier[200];
+FILE *f1;
+	
+	//verif_sauv();
+	
+	printf("nom du fichier à charger: ");
+	scanf("%s",nomfichier);
+	
+	f1= fopen(nomfichier,"r");
+	
+		while ( ! feof (f1) )	{
+			lectureOk = fscanf(f1,"%s %f %s %d %d %s %f", unproduit.nom, &unproduit.prix, unproduit.typeprix, &unproduit.quantite, &unproduit.seuilcmd, unproduit.dlc, &unproduit.tva);
+	
+			if (lectureOk != EOF)
+			 {
+		 		tabproduit[i++]=unproduit	;
+			 }
+		}
+fclose(f1);
+nbproduit=i;
+printf("%d produits chargés:\n",nbproduit);
+	
+}
+
+ /* ------------- Verif sauvegarde ----------*/
+/*
+void verif_sauv()
+{
+	char reponse[20];
+	
+if (a_sauvegarde)
+	 {
+		printf("Vos données sont modifiées, voulez vous sauvegarder? (o/n) : ");
+		scanf("%s",reponse); 
+		if (reponse[0] == 'O')
+		 {
+		 	sauvegarde();
+		 }
+	 }
+}
+*/	 
 /* --------- Quitter ------ */
   void quitter()
   {
