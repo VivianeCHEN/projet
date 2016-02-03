@@ -5,7 +5,7 @@
 /*..........................Type globale..........................*/
 
 struct produit{
-	int numprod, dlc, quantite, tva, qtemini;
+	int numprod, dlc, quantite, tva, seuilcmd;
 	char nom[20], categorie[30], typeprix[10];
 	float prix;
 };
@@ -32,7 +32,7 @@ main()
 
 while (choix !=0)
 {
-	printf("-1- Saisie\n")   ;
+	printf("-1- Saisie nouveaux produits\n")   ;
 	printf("-2- Affichage\n");
 	printf("-0- Quitter\n")  ;
 	printf("Choix : ")       ;
@@ -52,34 +52,34 @@ while (choix !=0)
 }
 
 /* -----------------------------Saisie-------------------------------- */
-void saisie()
+void saisie() /* Saisie de nouveaux produits en stock */ 
 {
 	struct produit unproduit;
-	int i=nbproduit; /*Ca permet d'aller à la suite quand on ajoute un produit, sans écraser tout ce qui a été rentrer*/
+	int i=nbproduit; /*Ca permet d'aller à la suite quand on ajoute un produit, sans écraser tout ce qui a été rentré*/
 	
 	unproduit.numprod= -1;
-		while (unproduit.numprod!= 00) /* veut dire tant que le numéro de produit n'est pas égal à FIN*/
+		while (unproduit.numprod!= 00) /* veut dire tant que le numéro de produit n'est pas égal à 00*/
 	{
 	  printf("Le numéro de produit (00 pour terminer) est : ");
 	  scanf("%d",&unproduit.numprod);
 	  
-	  if (unproduit.numprod != 00) /* On met fin en maj car le nom va etre converti en majuscule*/
+	  if (unproduit.numprod != 00) 
 	  {
-	   printf("Le nom du produit est : ");
+	   printf("La désignation du produit est : \n");
 	   scanf("%s",unproduit.nom); 
-	   printf("La catégorie : ");
+	   printf("La catégorie : \n");
 	   scanf("%s",unproduit.categorie);
-	   printf("Le prix: ");
+	   printf("Le prix unitaire ou kg: \n");
 	   scanf("%f",&unproduit.prix); 
-	   printf("Le type de prix (unité ou au kilos): ");
+	   printf("Le type de prix (unité ou au kilos): \n");
 	   scanf("%s",unproduit.typeprix);
-	   printf("La quantité: ");
+	   printf("La quantité commandée: \n");
 	   scanf("%d",&unproduit.quantite); 
-	   printf("La quantité minimale afin de lancer une commande est : ");
-	   scanf("%d",&unproduit.qtemini); 
-	   printf("La date limite de consommation du produit est : ");
+	   printf("Le seuil de sécurité est de : \n");
+	   scanf("%d",&unproduit.seuilcmd); 
+	   printf("La date limite de consommation du produit est : \n");
 	   scanf("%d",&unproduit.dlc); 
-	   printf("La tva est : ");
+	   printf("La tva est (ex: écrire 0,2 pour 20%) : \n");
 	   scanf("%d",&unproduit.tva); 
 	   
 	   tabproduit[i++]=unproduit; /* on ne peut pas mettre eleve.nom car on l'a pas déclarer, on a déclarer eleve*/
@@ -101,3 +101,9 @@ void affichage()
 printf("Affichage...\n");
 
 }
+
+/* --------- Quitter ------ */
+  void quitter()
+  {
+  	printf("Au revoir\n") ;
+  }
