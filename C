@@ -99,5 +99,5 @@ void affichage()
 {
 
 printf("Affichage...\n");
-
+je teste
 }
