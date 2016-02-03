@@ -6,7 +6,7 @@
 
 struct produit{
 	int numprod, quantite, seuilcmd;
-	char nom[20], typeprix[10], dlc[10];
+	char nom[20], typeprix[10], dlc[11];
 	float prix, tva;
 };
 
@@ -76,7 +76,7 @@ void saisie() /* Saisie de nouveaux produits en stock */
 	   scanf("%s",unproduit.nom); 
 	   printf("Le prix unitaire ou kg (ex: 5.20 pour 5.20€/u ou 5.20€/kg): ");
 	   scanf("%f",&unproduit.prix); 
-	   printf("Le type de prix (unité (u) OU kilos (k): ");
+	   printf("Le type de prix (unité (u) OU kilos (kg): ");
 	   scanf("%s",unproduit.typeprix);
 	   printf("La quantité commandée: ");
 	   scanf("%d",&unproduit.quantite); 
@@ -108,10 +108,18 @@ void affichage()
 		printf("Aucun produit à afficher\n");
 	else
 	{
+	printf("+----Designation-----++--Prix--++-Qtée-++-Seuil-++----DLC----++--TVA--+\n");
 	for (i=0; i<nbproduit; i++)
 		{
 		unproduit= tabproduit[i];
-		printf ("%s %f %s %d %d %s %f\n", unproduit.nom, unproduit.prix, unproduit.typeprix, unproduit.quantite, unproduit.seuilcmd, unproduit.dlc, unproduit.tva);
+		printf("|%20s|",unproduit.nom);
+		printf("|%6.2f",unproduit.prix);
+		printf("%2s|",unproduit.typeprix);
+		printf("|%6d|",unproduit.quantite);
+		printf("|%7d|",unproduit.seuilcmd);
+		printf("|%11s|",unproduit.dlc);
+		printf("|%7.2f|\n",unproduit.tva);
+
 		}
 	}
 
@@ -154,7 +162,7 @@ void verif_sauv()
 {
 	char reponse[20];
 	
-if (a_sauvegarde)
+if (a_sauvegarder)
 	 {
 		printf("Vos données sont modifiées, voulez vous sauvegarder? (o/n) : ");
 		scanf("%s",reponse); 
