@@ -1,19 +1,37 @@
 #include <stdio.h>
-#include <ctype.h>
 
-/*-------------Declaration preliminaire--------------------*/
-void saisie()      ;
-void affichage()   ;
+#define TAILLE 2000
+
+/*..........................Type globale..........................*/
+
+struct produit{
+	int numprod, dlc, quantite, tva, qtemini;
+	char nom[20], categorie[30], typeprix[10];
+	float prix;
+};
+
+/*..........................Variable globale..........................*/
+
+struct produit tabproduit[TAILLE];
+int nbproduit=0; /* a voir si on garde*/
+int a_sauvegarder=0;
+
+/*..........................Declaration preliminaire..........................*/
+void saisie(); /* correspond au référencement par le gestionnaire de stock*/
+void affichage(); /*affiche un element souhaité*/
 
 
+/*....................................................*/
 
-/* --------------------------------- */
 main()
 {
 	int choix = -1;
-	/* ------Menu------ */
-	while (choix !=0)
-	{
+	struct produit unproduit;
+	
+/*...............................Menu...................*/
+
+while (choix !=0)
+{
 	printf("-1- Saisie\n")   ;
 	printf("-2- Affichage\n");
 	printf("-0- Quitter\n")  ;
@@ -25,27 +43,55 @@ main()
 		case 1: saisie()      ;
 				break         ;
 		case 2: affichage()   ;
-				break         ;
-		case 0 : printf ("Au revoir\n")  ;
-				break                    ;
+				break         ;                ;
 		default: printf("Erreur de saisie\n");
 				break                        ;
 							
 	 }
-	}
+}
 }
 
-/* --------------------------------- */
+/* -----------------------------Saisie-------------------------------- */
 void saisie()
 {
-
-printf("Saisie....\n");
-
+	struct produit unproduit;
+	int i=nbproduit; /*Ca permet d'aller à la suite quand on ajoute un produit, sans écraser tout ce qui a été rentrer*/
+	
+	unproduit.numprod= -1;
+		while (unproduit.numprod!= 00) /* veut dire tant que le numéro de produit n'est pas égal à FIN*/
+	{
+	  printf("Le numéro de produit (00 pour terminer) est : ");
+	  scanf("%d",&unproduit.numprod);
+	  
+	  if (unproduit.numprod != 00) /* On met fin en maj car le nom va etre converti en majuscule*/
+	  {
+	   printf("Le nom du produit est : ");
+	   scanf("%s",unproduit.nom); 
+	   printf("La catégorie : ");
+	   scanf("%s",unproduit.categorie);
+	   printf("Le prix: ");
+	   scanf("%f",&unproduit.prix); 
+	   printf("Le type de prix (unité ou au kilos): ");
+	   scanf("%s",unproduit.typeprix);
+	   printf("La quantité: ");
+	   scanf("%d",&unproduit.quantite); 
+	   printf("La quantité minimale afin de lancer une commande est : ");
+	   scanf("%d",&unproduit.qtemini); 
+	   printf("La date limite de consommation du produit est : ");
+	   scanf("%d",&unproduit.dlc); 
+	   printf("La tva est : ");
+	   scanf("%d",&unproduit.tva); 
+	   
+	   tabproduit[i++]=unproduit; /* on ne peut pas mettre eleve.nom car on l'a pas déclarer, on a déclarer eleve*/
+						/* ici le nbeleves nous indique exactement le nombre d'eleve ranger, on a pas besoin de faire nbeleve=i-1 */
+		}
+	 }
+ nbproduit=i;
+ printf("%d est le nombre de produits saisie:\n",nbproduit);
+	
+ a_sauvegarder=1; /*On demande si on a une sauvegarde à faire*/
+	
 }
-
-
-
-
 
 
 /* --------------------------------- */
