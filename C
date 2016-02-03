@@ -34,7 +34,7 @@ main()
 while (choix !=0)
 {
 	printf("-1- Saisi de nouveaux produits\n")   ;
-	printf("-2- Affichage\n");
+	printf("-2- Affichage des produits\n");
 	printf("-0- Quitter\n")  ;
 	printf("Choix : ")       ;
 	scanf("%d", &choix)      ;	
@@ -70,7 +70,7 @@ void saisie() /* Saisie de nouveaux produits en stock */
 	  {
 	   printf("La désignation du produit est: ");
 	   scanf("%s",unproduit.nom); 
-	   printf("Le prix unitaire ou kg (ex: 5 pour 5€/u ou 5€/kg): ");
+	   printf("Le prix unitaire ou kg (ex: 5.20 pour 5.20€/u ou 5.20€/kg): ");
 	   scanf("%f",&unproduit.prix); 
 	   printf("Le type de prix (unité (u) OU kilos (k): ");
 	   scanf("%s",unproduit.typeprix);
@@ -80,7 +80,7 @@ void saisie() /* Saisie de nouveaux produits en stock */
 	   scanf("%d",&unproduit.seuilcmd); 
 	   printf("La date limite de consommation du produit est (ex: 14/02/2016): ");
 	   scanf("%s", unproduit.dlc); 
-	   printf("La tva est (ex: écrire 0,2 pour 20%%): ");
+	   printf("La tva est (ex: écrire 0.2 pour 20%%): ");
 	   scanf("%d",&unproduit.tva); 
 	   
 	   tabproduit[i++]=unproduit; 
@@ -97,6 +97,7 @@ void saisie() /* Saisie de nouveaux produits en stock */
 /* --------------------------------- */
 void affichage()
 {
+
 
 printf("Affichage...\n");
 
