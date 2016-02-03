@@ -18,7 +18,7 @@ int a_sauvegarder=0;
 
 /*..........................Declaration preliminaire..........................*/
 void saisie(); /* correspond au référencement par le gestionnaire de stock*/
-void affichage(); /*affiche un element souhaité*/
+void affichage(); /*affiche notre base de produits*/
 void quitter();
 void chargement();
 //void verif_sauv();
@@ -101,12 +101,21 @@ void saisie() /* Saisie de nouveaux produits en stock */
 /* -----------------Affichage ---------------- */
 void affichage()
 {
-
-
-printf("Affichage...\n");
+	struct produit unproduit;
+	int i;
+	
+	if (nbproduit==0)
+		printf("Aucun produit à afficher\n");
+	else
+	{
+	for (i=0; i<nbproduit; i++)
+		{
+		unproduit= tabproduit[i];
+		printf ("%s %f %s %d %d %s %f\n", unproduit.nom, unproduit.prix, unproduit.typeprix, unproduit.quantite, unproduit.seuilcmd, unproduit.dlc, unproduit.tva);
+		}
+	}
 
 }
-
 
 /* --------------- Chargement du fichier (base produits)-------------- */ 
 
