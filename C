@@ -1,214 +1,358 @@
 #include <stdio.h>
+#include <ctype.h>
+#include <string.h>
 
-#define TAILLE 2000
+#define TAILLE 200
+#define NON_TROUVE -1 /* On va l'utiliser dans recherche*/
 
 /*..........................Type globale..........................*/
 
-struct produit{
-	int numprod, quantite, seuilcmd;
-	char nom[20], typeprix[10], dlc[11];
-	float prix, tva;
+struct etudiant{  
+	char nom[20];		
+	char prenom[30];
+	int age;
 };
 
 /*..........................Variable globale..........................*/
 
-struct produit tabproduit[TAILLE];
-int nbproduit=0; /* a voir si on garde*/
+struct etudiant tabeleves[TAILLE];
+int nbeleves=0;
 int a_sauvegarder=0;
 
+
 /*..........................Declaration preliminaire..........................*/
-void saisie(); /* correspond au référencement par le gestionnaire de stock*/
-void affichage(); /*affiche notre base de produits*/
-void quitter();
+
+void saisie();
+void affichage();
+void conv_maj (char chaine[]);
+void sauvegarde();
 void chargement();
-void vente();
-//void verif_sauv();
+void vider();
+int recherche(char nomrech[]);
+void modification();
+void supression();
+void quitter();
+void verif_sauvegarde();
 
-/*.......................Menu .............................*/
-
+/*....................................................*/
 main()
 {
-	int choix = -1;
-	struct produit unproduit;
-	
-/*...............Menu..........*/
+int choix = -1, numero;
+char nom[20]; /* ref à case 6*/
+struct etudiant eleve; /* aucun rôle, permet de simplifier l'écriture */
 
-while (choix !=0)
-{
-	printf("-1- Saisi de nouveaux produits\n")   ;
-	printf("-2- Affichage des produits\n");
-	printf("-3- Chargement d'un fichier de produits dans la BDD\n");
-	printf("-4- Vente\n")	 ;
-	printf("-0- Quitter\n")  ;
-	printf("Choix : ")       ;
-	scanf("%d", &choix)      ;	
+/*.............Menu/.........*/
+
+while(choix!=0)
+  {
+	printf("-1- Saisir\n")     ;
+	printf("-2- Affichage\n")  ;
+	printf("-3- Sauvegarder\n")  ;
+	printf("-4- Chargement\n")     ;
+	printf("-5- Vider\n")     ;
+	printf("-6- Rechercher\n")     ;
+	printf("-7- Modification\n")     ;
+	printf("-8- Supression\n")     ;
+	printf("-0- Quitter\n")     ;
+	printf("Choix : ")         ;
+	scanf("%d",&choix)         ;
 	
 	switch(choix)
-	 {
-		case 1: saisie()      ;
-				break         ;
-		case 2: affichage()   ;
-				break         ;
-		case 3: chargement()  ;
-				break		  ;
-		case 4: vente()  	  ;
-				break		  ;  
-		case 0: quitter() 	  ;
-				break	      ;        
-		default: printf("Erreur de saisie\n");
-				break                        ;
-							
-	 }
-}
+	{
+	case 1: saisie()     ;
+			break        ;
+	case 2: affichage()  ;
+			break        ;
+	case 3: sauvegarde() ;
+			break        ;   
+			break        ;   
+	case 4: chargement();
+			break  		;
+	case 5: vider();
+			break  ;
+	case 6: printf("Entrez un nom à rechercher : ");
+			scanf("%s",nom);
+			conv_maj(nom); /* car tout est en maj dans le tab*/
+			numero= recherche(nom);
+			eleve=tabeleves[numero]; /*variable eleve est local*/
+			if (numero == NON_TROUVE)
+			{
+				printf("%s n'a pas été trouvé\n",nom);
+			}
+			else
+			{
+				printf("%s %s %d\n",eleve.nom,eleve.prenom,eleve.age); /* si javais pas déclarer ma variable eleve en haut dans la struct etudiant, j'urai du écrire tabeleves[numero].nom etc avec prenom et age) */
+			}
+			break  ;
+	case 7: modification();
+			break  ;
+	case 8: supression();
+			break  ;
+	case 0: quitter();
+			break                ;
+	default: printf("Erreur de saisie\n");
+			break                        ;
+	}
+  }
 }
 
-/* -----------------------------Saisie-------------------------------- */
-void saisie() /* Saisie de nouveaux produits en stock */ 
+/*......................Saisie..............................*/
+void saisie()
 {
-	struct produit unproduit;
-	int i=nbproduit; /*Ca permet d'aller à la suite quand on ajoute un produit, sans écraser tout ce qui a été rentré*/
+	struct etudiant eleve;
+	int i=nbeleves; /*il faut mettre i=nbeleves et non pas O sinon a la prochaine saisie ca va tout écraser, et ca continue pas à la suite*/
 	
-	unproduit.numprod= -1;
-		while (unproduit.numprod!= 00) /* veut dire tant que le numéro de produit n'est pas égal à 00*/
+	strcpy(eleve.nom,"bidon"); /* on est obliger de mettre qqch diff de 0 pour rentrer dans la boucle, comme c'est une chaîne on a pas le droit de faire affectation soit eleve.nom="bidon" */
+	
+	while (strcmp(eleve.nom,"FIN") != 0) /* ne renvoie pas un booleen, mais renvoie le nombre de diff*/
 	{
-	  printf("Le numéro de produit (00 pour terminer) est : ");
-	  scanf("%d",&unproduit.numprod);
+	  printf("Nom (fin pour terminer) : ");
+	  scanf("%s",eleve.nom);
+	  conv_maj(eleve.nom); /* On appele la procédure de conversion pour le nom*/
 	  
-	  if (unproduit.numprod != 00) 
+	  if (strcmp(eleve.nom,"FIN") != 0) /* On met fin en maj car le nom va etre converti en majuscule*/
 	  {
-	   printf("La désignation du produit est: ");
-	   scanf("%s",unproduit.nom); 
-	   printf("Le prix unitaire ou kg (ex: 5.20 pour 5.20€/u ou 5.20€/kg): ");
-	   scanf("%f",&unproduit.prix); 
-	   printf("Le type de prix (unité (u) OU kilos (kg): ");
-	   scanf("%s",unproduit.typeprix);
-	   printf("La quantité commandée: ");
-	   scanf("%d",&unproduit.quantite); 
-	   printf("Le seuil de sécurité est de: ");
-	   scanf("%d",&unproduit.seuilcmd); 
-	   printf("La date limite de consommation du produit est (ex: 14/02/2016): ");
-	   scanf("%s", unproduit.dlc); 
-	   printf("La tva est (ex: écrire 0.2 pour 20%%): ");
-	   scanf("%f",&unproduit.tva); 
-	   
-	   tabproduit[i++]=unproduit; 
+	   printf("Prenom : ");
+	   scanf("%s",eleve.prenom); 
+	   conv_maj(eleve.prenom); /* On appele la procédure de conversion pour le nom*/
+	   printf("Age : ");
+	   scanf("%d",&eleve.age);
+	   tabeleves[i++]=eleve; /* on ne peut pas mettre eleve.nom car on l'a pas déclarer, on a déclarer eleve*/
+						/* ici le nbeleves nous indique exactement le nombre d'eleve ranger, on a pas besoin de faire nbeleve=i-1 */
 		}
-	 }
- nbproduit=i;
- printf("%d produits saisis:\n",nbproduit);
+	}
+ nbeleves=i;
+ printf("%d eleves saisies\n",nbeleves);
 	
  a_sauvegarder=1; /*On demande si on a une sauvegarde à faire*/
 	
 }
 
-
-/* -----------------Affichage ---------------- */
+/*......................Affichage..............................*/
 void affichage()
 {
-	struct produit unproduit;
+	struct etudiant eleve;
 	int i;
 	
-	if (nbproduit==0)
-		printf("Aucun produit à afficher\n");
+	if (nbeleves ==0)
+	  printf("Aucun eleve à afficher\n");
 	else
-	{
-	printf("+--Num--++----Designation-----++--Prix--++-Qtée-++-Seuil-++----DLC----++--TVA--+\n");
-	for (i=0; i<nbproduit; i++)
-		{
-		unproduit= tabproduit[i];
-		printf("|%7d|",unproduit.numprod);
-		printf("|%20s|",unproduit.nom);
-		printf("|%6.2f",unproduit.prix);
-		printf("%2s|",unproduit.typeprix);
-		printf("|%6d|",unproduit.quantite);
-		printf("|%7d|",unproduit.seuilcmd);
-		printf("|%11s|",unproduit.dlc);
-		printf("|%7.2f|\n",unproduit.tva);
+	{  
+	for (i=0; i<nbeleves;i++)
+	 {
+	  eleve= tabeleves[i]; /* on rentre dans eleves et non pas eleve.nom puis eleve.prenom car c pas déclarer*/
+	  printf("%s %s %d\n",eleve.nom,eleve.prenom,eleve.age);
+	 }
+	}
+	
+}
 
+/*......................Convertirenmaj................................*/
+void conv_maj (char chaine[]) /* on a déclaration de chaine, c'est un paramètre formel*/
+{
+	int taille, i;
+	
+	taille= strlen(chaine);
+	for (i=0; i<taille; i++) /* on met < et non pas <= car sinon il serait aller jusqu'à la case \o*/
+	 {
+	  chaine[i]=toupper(chaine[i]);
+	 }
+}
+
+/*........................Sauvegarde....................................*/
+/*on reprend affichage*/
+void sauvegarde()
+{
+	struct etudiant eleve;
+	int i;
+	FILE *f1;
+	char nomfichier[200];
+		
+	if (nbeleves ==0)
+	  printf("Aucun eleve à sauvegarder\n");
+	else
+	{  
+	printf("Nom du fichier de sauvegarde: ");
+	scanf("%s",nomfichier);
+	f1=fopen(nomfichier,"w");
+	for (i=0; i<nbeleves;i++)
+	 {
+	  eleve= tabeleves[i]; 
+	  fprintf(f1,"%s %s %d\n",eleve.nom,eleve.prenom,eleve.age);
+	 }
+	fclose(f1);
+	printf("%d eleves sauvegardés\n",nbeleves);
+	}
+
+a_sauvegarder=0;
+}
+
+/*.................chargement...................*/
+void chargement()  /* on vire tout ce qui est test fin, car pour le chargement il va arrêter de charger quand y aura plus rien*/
+{
+	struct etudiant eleve;
+	int i=0, lectureok; /*il faut mettre i=0 car quand on ouvre un fichier il faut avoir que ce qu'il y a dans le fichier, et ne sécrit pas à la suite car si i=nbeleve la premiere case où je rentre c'est nbeleve*/
+	FILE *f1;
+	char nomfichier[200], reponse[20];
+	
+	verif_sauvegarde();
+	
+	printf("Nom du fichier à charger: ");
+	scanf("%s",nomfichier);
+	
+	f1=fopen(nomfichier,"r");
+	
+	while ( !feof(f1) ) 
+	{
+	  lectureok=fscanf(f1,"%s %s %d",eleve.nom,eleve.prenom,&eleve.age); /* on met lectureOK pour qu'on me retourne qqch si sa plante, sinon je saurais pas*/
+	  if(lectureok !=EOF)
+	  {
+	   conv_maj(eleve.nom); /* normalement c déjà en maj, mais par mesure de sécu, on re laisse*/
+	   conv_maj(eleve.prenom);
+	   tabeleves[i++]=eleve; 
+	  }
+	}
+ fclose(f1);
+ nbeleves=i;
+ printf("%d eleves lus\n",nbeleves);
+	
+}
+
+/*......................Vider............*/
+void vider()
+{
+ nbeleves=0; /*comme j'ai 0 eleve, il va rien me dire que y a aucun eleve*/
+ printf("Le fichier a été vidé\n");
+ 
+ a_sauvegarder=1;
+ 
+}
+
+
+/*.....................Recherche.............................*/
+int recherche(char nomrech[])
+{
+    struct etudiant eleve;
+    int i, numcase = NON_TROUVE;
+    
+    if (nbeleves ==0)
+    printf("Aucun eleve pour la recherche\n");
+    else
+    {
+        for (i=0; i<nbeleves;i++)
+        {
+            eleve= tabeleves[i]; 
+
+		if (strcmp(eleve.nom,nomrech)==0)
+		 {
+		  numcase=i;
+		
+		 }
+		
+    	}
+    }
+   return numcase; 
+}
+
+/*...........................Modification..................................*/
+void modification()
+{
+	int numero;
+	char nom[20];
+	struct etudiant eleve;
+
+
+	if (nbeleves ==0)
+    	printf("Aucun eleve actuellement pour la modification\n");
+    else
+    {
+		printf("Entrez un nom de la personne à modifier: ");
+		scanf("%s",nom);
+		conv_maj(nom); 
+		numero= recherche(nom);
+		if (numero == NON_TROUVE)
+		{
+			printf("Aucune modification: %s n'a pas été trouvé\n",nom);
+		}
+		else
+		{
+			eleve = tabeleves[numero]; /* je vais extraire a partir de la case où se trouve la personne, je vais avoir son nom prenom et age*/
+			
+			printf("Nom actuel : %s --",eleve.nom);
+			printf("Nouveau nom : ");
+			scanf("%s",eleve.nom);
+			conv_maj(eleve.nom); /* comme on vient de saisir un nom, il faut pas oublier de convertir le nom en MAJ*/
+			
+			printf("Prénom actuel : %s --",eleve.prenom);
+			printf("Nouveau prénom : ");
+			scanf("%s",eleve.prenom);
+			conv_maj(eleve.prenom);
+			
+			printf("Age actuel : %d --",eleve.age);
+			printf("Nouvel age : ");
+			scanf("%d",&eleve.age);
+			
+			tabeleves[numero]=eleve; /* ici je recolle dans la case*/	
+			a_sauvegarder=1;
 		}
 	}
 
 }
-
-/* --------------- Chargement du fichier (base produits)-------------- */ 
-
-void chargement()
+/*..........................Supression.............................*/
+void supression()
 {
+	int numero, i ;
+	char nom[20];
+	struct etudiant eleve;
 
-struct produit unproduit;
-int i=0, lectureOk;
-char nomfichier[200];
-FILE *f1;
-	
-	//verif_sauv();
-	
-	printf("nom du fichier à charger: ");
-	scanf("%s",nomfichier);
-	
-	f1= fopen(nomfichier,"r");
-	
-		while ( ! feof (f1) )	{
-			lectureOk = fscanf(f1," %d %s %f %s %d %d %s %f", &unproduit.numprod, unproduit.nom, &unproduit.prix, unproduit.typeprix, &unproduit.quantite, &unproduit.seuilcmd, unproduit.dlc, &unproduit.tva);
-	
-			if (lectureOk != EOF)
-			 {
-		 		tabproduit[i++]=unproduit	;
-			 }
-		}
-fclose(f1);
-nbproduit=i;
-printf("%d produits chargés:\n",nbproduit);
-	
-}
-/* ------------- Vente (par numéro produit) ------------*/ 
-void vente()
-{
-	int nbvendu, numero;
-	struct produit unproduit;
-
-printf ("Saisir le numéro du produit vendu : ");
-scanf("%d", &numero);
-/* numero=recherche(numero);
- 	if numero == NON_TROUVE)
- 		{
- 			printf("Ce produit n'existe pas dans la base"); 
- 		}; 
- 	  else 
- 	  	{ */
-	
-	unproduit = tabproduit[numero];
-printf ("Saisir le nombre de produits vendus : ");
-scanf("%d", &nbvendu);
-	if ((unproduit.quantite-nbvendu)<0)
-		{ 
-			printf("Il ne reste pas assez de stock en magasin de ce produit");
-		}
-	else 
+	if (nbeleves == 0)
+    	printf("Aucun eleve actuellement pour la suppression\n");
+    else
+    {
+		printf("Entrez le nom de la personne à supprimerr: ");
+		scanf("%s",nom);
+		conv_maj(nom); 
+		numero= recherche(nom);
+		if (numero == NON_TROUVE)
 		{
-			unproduit.quantite-=nbvendu;
-			tabproduit[numero]=unproduit;
+			printf("Aucune suppression: %s n'a pas été trouvé\n",nom);
 		}
+		else
+		{
+			eleve=tabeleves[numero];
+			printf("Eleve %s %s %d supprimé=\n",eleve.nom,eleve.prenom,eleve.age);
+			for (i=numero; i<nbeleves ; i++)
+			{
+				tabeleves[i] = tabeleves[i+1];
+			}
+			nbeleves-- ;
+			a_sauvegarder=1;
+		}
+	}
+}
+/*...............................quitter.........................................*/
+void quitter()
+{
+	verif_sauvegarde();
+	printf("Au revoir\n");
 }
 
- /* ------------- Verif sauvegarde ----------*/
-/*
-void verif_sauv()
+
+/*..............................verif_sauvegarde...............................*/
+
+void verif_sauvegarde()
 {
-	char reponse[20];
-	
-if (a_sauvegarder)
-	 {
-		printf("Vos données sont modifiées, voulez vous sauvegarder? (o/n) : ");
-		scanf("%s",reponse); 
+ char reponse[20];
+ 
+ if (a_sauvegarder) /* sous-entendu vrai*/
+
+	{
+		printf("Vos données sont modifiées. Voulez-vous faire une sauvegarde? (o/n) : ");
+		scanf("%s",reponse);  /* pour éviter d'avoir en mémoire un caractére "entrer" qui traine si on avait mis %c on va laisser en %s mais on va seulement lire la case 0, car si on laisser c, au prochain scanf ("%c" qu'on va faire, ca va lire le LF soit le entrer */
+		conv_maj(reponse);
 		if (reponse[0] == 'O')
-		 {
-		 	sauvegarde();
-		 }
-	 }
+		{
+			sauvegarde();
+		}
+	}
 }
-*/	 
-/* --------- Quitter ------ */
-  void quitter()
-  {
-  	printf("Au revoir\n") ;
-  }
