@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <string.h>
 
 #define TAILLE 2000
+#define NON_TROUVE -1
 
 /*..........................Type globale..........................*/
 
@@ -22,14 +24,20 @@ void affichage(); /*affiche notre base de produits*/
 void quitter();
 void chargement();
 void vente();
-//void verif_sauv();
+void verif_sauv();
+int recherchenom(char prodrech[] );
+int recherchenum(int numprodrech);
+void affichagerecherche(int ligne);
+
+
 
 /*.......................Menu .............................*/
 
 main()
 {
-	int choix = -1;
+	int choix = -1,num;
 	struct produit unproduit;
+	char nom[50]; /* reference au case 5 */
 	
 /*...............Menu..........*/
 
@@ -39,6 +47,7 @@ while (choix !=0)
 	printf("-2- Affichage des produits\n");
 	printf("-3- Chargement d'un fichier de produits dans la BDD\n");
 	printf("-4- Vente\n")	 ;
+	printf("-5- Rechercher un produit\n");
 	printf("-0- Quitter\n")  ;
 	printf("Choix : ")       ;
 	scanf("%d", &choix)      ;	
@@ -53,6 +62,18 @@ while (choix !=0)
 				break		  ;
 		case 4: vente()  	  ;
 				break		  ;  
+		case 5: printf ("Quel est le produit que vous recherchez ? : \n");
+				scanf("%s",nom);
+				num=recherchenom(nom);
+				unproduit=tabproduit[num];
+				if (num == NON_TROUVE)
+				{
+					printf("%s n'a pas été trouvé\n",nom);
+				}
+				else
+				{
+				affichagerecherche(num);
+				}
 		case 0: quitter() 	  ;
 				break	      ;        
 		default: printf("Erreur de saisie\n");
@@ -102,7 +123,7 @@ void saisie() /* Saisie de nouveaux produits en stock */
 }
 
 
-/* -----------------Affichage ---------------- */
+/* -----------------Affichage BDD produit---------------- */
 void affichage()
 {
 	struct produit unproduit;
@@ -128,6 +149,53 @@ void affichage()
 		}
 	}
 
+}
+
+/*---------------------Affichage un produit ---------*/
+
+void affichagerecherche(int ligne)
+{
+	struct produit unproduit;
+
+	printf("+--Num--++----Designation-----++--Prix--++-Qtée-++-Seuil-++----DLC----++--TVA--+\n");
+	unproduit= tabproduit[ligne];
+		
+	printf("|%7d|",unproduit.numprod);
+	printf("|%20s|",unproduit.nom);
+	printf("|%6.2f",unproduit.prix);
+	printf("%2s|",unproduit.typeprix);
+	printf("|%6d|",unproduit.quantite);
+	printf("|%7d|",unproduit.seuilcmd);
+	printf("|%11s|",unproduit.dlc);
+	printf("|%7.2f|\n",unproduit.tva);
+
+}
+
+/*------------------Sauvegarder-------------------------*/
+void sauvegarder()
+{
+	struct produit unproduit;
+	int i;
+	FILE *f1;
+	char nomfichier[2000];
+	
+	if (nbproduit==0)
+		printf("Il n'y a aucun produit à sauvegarder\n");
+	else
+	{  
+	printf("Nom du fichier de sauvegarde: ");
+	scanf("%s",nomfichier);
+	f1=fopen(nomfichier,"w");
+	for (i=0; i<nbproduit;i++)
+	 {
+	  unproduit= tabproduit[i]; 
+	  fprintf(f1,"%s %f %s %d %d %s %f\n", unproduit.nom, unproduit.prix, unproduit.typeprix, unproduit.quantite, unproduit.seuilcmd, unproduit.dlc, unproduit.tva);
+	 }
+	fclose(f1);
+	printf("%d produits sont sauvegardés dans le fichier %s\n",nbproduit, nomfichier);
+	}
+
+a_sauvegarder=0;
 }
 
 /* --------------- Chargement du fichier (base produits)-------------- */ 
@@ -160,6 +228,56 @@ nbproduit=i;
 printf("%d produits chargés:\n",nbproduit);
 	
 }
+/*-----------------------------Recherche un produit par le nom----------------------------*/
+
+int recherchenom(char prodrech[])
+{
+    struct produit unproduit;
+    int i, numcase = NON_TROUVE;
+    
+    if (nbproduit ==0)
+    printf("Il n'y a aucun produit correspondant à votre recherche\n");
+    else
+    {
+        for (i=0; i<nbproduit;i++)
+        {
+            unproduit= tabproduit[i]; 
+
+		if (strcmp(unproduit.nom,prodrech)==0)
+		 {
+		  numcase=i; /* le numcase correspond à la ligne où se trouve le produit*/
+		 }
+    	}
+    }
+    return numcase;
+    
+}
+
+/*-----------------------------Recherche un produit par le numéro----------------------------*/
+
+int recherchenum(int numprodrech)
+{
+    struct produit unproduit;
+    int i, numcase = NON_TROUVE;
+    
+    if (nbproduit ==0)
+    printf("Il n'y a aucun produit correspondant à votre recherche\n");
+    else
+    {
+        for (i=0; i<nbproduit;i++)
+        {
+            unproduit= tabproduit[i]; 
+
+		if (unproduit.numprod==numprodrech)
+		 {
+		  numcase=i; /* le numcase correspond à la ligne où se trouve le produit*/
+		 }
+    	}
+    }
+    return numcase;
+    
+}
+
 /* ------------- Vente (par numéro produit) ------------*/ 
 void vente()
 {
@@ -168,30 +286,31 @@ void vente()
 
 printf ("Saisir le numéro du produit vendu : ");
 scanf("%d", &numero);
-/* numero=recherche(numero);
- 	if numero == NON_TROUVE)
+
+numero = recherchenum(numero); /* la fonction va nous renvoyer le numéro de la ligne du tableau qu'on va stocker dans la variable numero */
+ 	if (numero == NON_TROUVE)
  		{
  			printf("Ce produit n'existe pas dans la base"); 
- 		}; 
+ 		} 
  	  else 
- 	  	{ */
-	
-	unproduit = tabproduit[numero];
-printf ("Saisir le nombre de produits vendus : ");
-scanf("%d", &nbvendu);
-	if ((unproduit.quantite-nbvendu)<0)
-		{ 
-			printf("Il ne reste pas assez de stock en magasin de ce produit");
-		}
-	else 
-		{
-			unproduit.quantite-=nbvendu;
-			tabproduit[numero]=unproduit;
-		}
+ 	  	{ 
+			unproduit = tabproduit[numero];
+			printf ("Saisir le nombre de produits vendus : ");
+			scanf("%d", &nbvendu);
+				if ((unproduit.quantite-nbvendu)<0)
+					{ 
+						printf("Il ne reste pas assez de stock en magasin de ce produit");
+					}
+				else 
+					{
+						unproduit.quantite-=nbvendu;
+						tabproduit[numero]=unproduit;
+					}
+		}			
 }
 
  /* ------------- Verif sauvegarde ----------*/
-/*
+
 void verif_sauv()
 {
 	char reponse[20];
@@ -202,11 +321,11 @@ if (a_sauvegarder)
 		scanf("%s",reponse); 
 		if (reponse[0] == 'O')
 		 {
-		 	sauvegarde();
+		 	sauvegarder();
 		 }
 	 }
 }
-*/	 
+ 
 /* --------- Quitter ------ */
   void quitter()
   {
